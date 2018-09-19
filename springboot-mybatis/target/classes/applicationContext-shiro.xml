@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+							http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Shiro过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">  
+	    <!-- Shiro的核心安全接口,这个属性是必须的 -->  
+	    <property name="securityManager" ref="securityManager"/>
+	    <!-- 身份认证失败，则跳转到登录页面的配置 -->  
+	    <property name="loginUrl" value="/index.jsp"/>
+	    <!-- 权限认证失败，则跳转到指定页面 -->  
+	    <property name="unauthorizedUrl" value="/unauthor.jsp"/>  
+	    <!-- Shiro连接约束配置,即过滤链的定义 -->  
+	    <property name="filterChainDefinitions">  
+	        <value>  
+	             /login=anon
+				/admin*=authc
+				/student=roles[teacher]
+				/teacher=perms["user:create"]
+	        </value>  
+	    </property>
+	</bean>  
+	
+	<!-- Shiro Filter -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		
+		<!-- cas -->
+		<property name="loginUrl" value="${cas.serve.login}" />
+
+		<property name="unauthorizedUrl" value="/warn/unauthorized.htm" />
+		<!-- 动态权限设置 -->
+		<property name="filterChainDefinitionMap" ref="chainDefinitionSectionMetaSource" />
+	</bean>
+	
+	<!-- 安全管理 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="casRealm" />
+		<property name="cacheManager" ref="shiroEhcacheManager" />
+		<property name="sessionManager" ref="sessionManager" />
+		<!-- <property name="rememberMeManager" ref="rememberMeManager" /> -->
+	</bean>
+	
+
+	<!-- shiro的缓存管理器，然后需要将缓存管理器注入到安全管理其中  -->  
+	<bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">  
+		<property name="cacheManagerConfigFile" value="classpath:ehcache-shiro.xml" />  
+	</bean>
+	
+	
+	<!-- 会话管理器 -->  
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">  
+       <property name="globalSessionTimeout" value="1800000"/>
+       <property name="deleteInvalidSessions" value="true"/>  
+       <property name="sessionIdCookie" ref="sessionIdCookie" />
+       <property name="sessionIdCookieEnabled" value="true" />
+       	<!-- session会话监听 -->
+    	<property name="sessionListeners" >
+    		<list>
+    			<ref bean="shiroSessionListener" />
+    		</list>
+    	</property>
+    </bean>  
+    
+    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+    	<property name="name" value="SSOSESSIONID" />
+    	<property name="httpOnly" value="true"/>
+    </bean>
+    
+	<!-- session监听 -->
+	<bean id="shiroSessionListener"  class="com.zhangjie.springboot.shrio.ShiroSessionListener" />    
+
+</beans>

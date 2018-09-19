@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    	
+	<cache name="authenticationCache"  
+		maxElementsInMemory="10000" 
+		eternal="false"  
+   	 	timeToIdleSeconds="300000" 
+    	timeToLiveSeconds="18000000" 
+    	overflowToDisk="true" /> 
+    	
+	<cache name="authorizationCache"  
+		maxElementsInMemory="10000" 
+		eternal="false"  
+   	 	timeToIdleSeconds="300000" 
+    	timeToLiveSeconds="18000000" 
+    	overflowToDisk="true" />  
+    
+    
+</ehcache>
